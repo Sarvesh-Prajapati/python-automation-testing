@@ -82,4 +82,24 @@ def test_password_strength():
     assert validate_password("ABCDEFG@") == False                # Missing number and lower case
 
 
+# -------------- UNIT TESTING PASSWORD STRENGTH USING PARAMETRIZATION --------------------
+%%writefile test_password_strength.py
 
+import pytest
+import re
+
+def validate_password(password):
+    if len(password) < 8 or len(password) > 16: return False             # Password length
+    if " " in password or "-" in password: return False                  # No space or hyphen in PW
+    if not re.search(r'\d', password): return False                      # at least 1 number
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password): return False  # at least 1 special char
+    if not re.search(r'[A-Z]', password): return False                   # at least 1 uppercase letter
+    if not re.search(r'[a-z]', password): return False                   # at least 1 lower case letter
+    return True
+
+pw_list = ["Password123!", "aB1@cDeFghIjK", "short", "toolongpasswordtoolong"]
+
+@pytest.mark.parametrize("password", pw_list)
+def test_password(password):
+  assert validate_password(password) == True
+  # print(f'Found password {password} as :', validate_password(password))
